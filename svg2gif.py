@@ -3,6 +3,34 @@ import time
 from io import BytesIO
 from PIL import Image
 from playwright.sync_api import sync_playwright
+import xml.etree.ElementTree as ET
+
+def print_svg_aspect_ratio(file_path):
+    # Parse the SVG file
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    
+    # Strip namespace if present (e.g., '{http://w3.org}svg')
+    tag = root.tag.split('}')[-1]
+    if tag != 'svg':
+        print("Error: Not a valid SVG root element.")
+        return
+
+    # Check for viewBox first (most reliable for aspect ratio)
+    viewbox = root.get('viewBox')
+    if viewbox:
+        _, _, w, h = map(float, viewbox.replace(',', ' ').split())
+    else:
+        # Fallback to width and height attributes
+        w = float(root.get('width', 0).replace('px', ''))
+        h = float(root.get('height', 0).replace('px', ''))
+
+    if w > 0 and h > 0:
+        ratio = w / h
+        print(f"SVG Width: {w}, Height: {h}")
+        print(f"SVG Aspect Ratio (W/H): {ratio:.4f}")
+    else:
+        print("SVG: Could not determine valid dimensions or viewBox.")
 
 def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0, fps=30):
     """
@@ -10,6 +38,7 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
     and saves them as an animated GIF.
     """
     # Read the SVG content
+    print_svg_aspect_ratio(svg_path)
     with open(svg_path, "r", encoding="utf-8") as f:
         svg_content = f.read()
 
@@ -83,15 +112,20 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
         # --- OPTIMIZATION STEP 1: Downscale dimensions if the source is massive ---
         # GIFs compress poorly at high resolutions. 500-600px max width is ideal.
         MAX_WIDTH = 640 
+        print("height before", frames[0].height)
+        print("aspect ratio before", frames[0].width/frames[0].height)
         first_frame = frames[0]
         if first_frame.width > MAX_WIDTH:
             scale_factor = MAX_WIDTH / first_frame.width
+            print("scale_factor", scale_factor)
             new_size = (MAX_WIDTH, int(first_frame.height * scale_factor))
             frames = [img.resize(new_size, Image.Resampling.LANCZOS) for img in frames]
 
         # --- OPTIMIZATION STEP 2: Quantize and Optimize Palette ---
         # Convert images to Palette mode ('P') with an adaptive 256-color map.
         # This reduces data size per frame dramatically.
+        print("height after", frames[0].height)
+        print("aspect ratio after", frames[0].width/frames[0].height)
         optimized_frames = []
         for img in frames:
             # 'adaptive' creates a custom palette optimized for your SVG's exact colors
