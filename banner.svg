@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    @keyframes floatBox {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes dashStream {
+      0% { stroke-dashoffset: 100; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .g-glow { animation: pulseGlow 4s ease-in-out infinite; transform-origin: center; }
+    .floating-box { animation: floatBox 3s ease-in-out infinite; }
+    .stream-line { stroke-dasharray: 10 15; animation: dashStream 2s linear infinite; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1200" height="300" rx="16" fill="url(#bg-grad)" stroke="#334155" stroke-width="2"/>
+
+  <!-- Glowing Orbs -->
+  <circle cx="200" cy="150" r="120" fill="#38bdf8" opacity="0.15" class="g-glow" filter="url(#glow)"/>
+  <circle cx="1000" cy="150" r="140" fill="#c084fc" opacity="0.15" class="g-glow" filter="url(#glow)"/>
+
+  <!-- Tech Grid Overlay -->
+  <path d="M0 50 H1200 M0 100 H1200 M0 150 H1200 M0 200 H1200 M0 250 H1200" stroke="#334155" stroke-width="1" opacity="0.2"/>
+  <path d="M200 0 V300 M400 0 V300 M600 0 V300 M800 0 V300 M1000 0 V300" stroke="#334155" stroke-width="1" opacity="0.2"/>
+
+  <!-- Dynamic Package Connectors -->
+  <path d="M 150 150 L 320 150" stroke="#38bdf8" stroke-width="3" class="stream-line"/>
+  <path d="M 880 150 L 1050 150" stroke="#c084fc" stroke-width="3" class="stream-line"/>
+
+  <!-- Animated Package Icons -->
+  <g class="floating-box">
+    <!-- Left Box Icon -->
+    <g transform="translate(100, 110)">
+      <polygon points="40,0 80,20 80,60 40,80 0,60 0,20" fill="#0284c7" opacity="0.8" stroke="#38bdf8" stroke-width="2"/>
+      <polygon points="40,0 80,20 40,40 0,20" fill="#38bdf8" opacity="0.6"/>
+      <line x1="40" y1="40" x2="40" y2="80" stroke="#38bdf8" stroke-width="2"/>
+    </g>
+
+    <!-- Right Container Icon -->
+    <g transform="translate(1020, 110)">
+      <rect x="0" y="0" width="70" height="70" rx="10" fill="#7e22ce" opacity="0.8" stroke="#c084fc" stroke-width="2"/>
+      <path d="M15 20 H55 M15 35 H55 M15 50 H55" stroke="#c084fc" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Title & Subtitle Text -->
+  <g text-anchor="middle">
+    <!-- Main Title -->
+    <text x="600" y="130" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="52" fill="url(#text-grad)" filter="url(#glow)">
+      Awesome Package Registry SaaS
+    </text>
+    
+    <!-- Subtitle -->
+    <text x="600" y="185" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="20" fill="#94a3b8" letter-spacing="2">
+      📦 TOP PACKAGE REGISTRY SAAS &amp; OPEN-SOURCE ECOSYSTEM 🚀
+    </text>
+
+    <!-- Category Pills -->
+    <g transform="translate(360, 220)">
+      <rect x="0" y="0" width="130" height="32" rx="16" fill="#1e293b" stroke="#0284c7" stroke-width="1.5"/>
+      <text x="65" y="21" font-family="sans-serif" font-size="13" font-weight="600" fill="#38bdf8">npm / PyPI</text>
+
+      <rect x="145" y="0" width="140" height="32" rx="16" fill="#1e293b" stroke="#6366f1" stroke-width="1.5"/>
+      <text x="215" y="21" font-family="sans-serif" font-size="13" font-weight="600" fill="#818cf8">Docker / OCI</text>
+
+      <rect x="300" y="0" width="170" height="32" rx="16" fill="#1e293b" stroke="#a855f7" stroke-width="1.5"/>
+      <text x="385" y="21" font-family="sans-serif" font-size="13" font-weight="600" fill="#c084fc">Maven / NuGet</text>
+    </g>
+  </g>
+</svg>
