@@ -78,22 +78,47 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
 
     # Save the accumulated frames into a looping animated GIF
     if frames:
-        print(f"Compiling frames into {output_gif_path}...")
-        frames[0].save(
+        print(f"Compiling and compressing frames into {output_gif_path}...")
+        
+        # --- OPTIMIZATION STEP 1: Downscale dimensions if the source is massive ---
+        # GIFs compress poorly at high resolutions. 500-600px max width is ideal.
+        MAX_WIDTH = 640 
+        first_frame = frames[0]
+        if first_frame.width > MAX_WIDTH:
+            scale_factor = MAX_WIDTH / first_frame.width
+            new_size = (MAX_WIDTH, int(first_frame.height * scale_factor))
+            frames = [img.resize(new_size, Image.Resampling.LANCZOS) for img in frames]
+
+        # --- OPTIMIZATION STEP 2: Quantize and Optimize Palette ---
+        # Convert images to Palette mode ('P') with an adaptive 256-color map.
+        # This reduces data size per frame dramatically.
+        optimized_frames = []
+        for img in frames:
+            # 'adaptive' creates a custom palette optimized for your SVG's exact colors
+            paletted_img = img.convert("P", palette=Image.Palette.ADAPTIVE, colors=256)
+            optimized_frames.append(paletted_img)
+
+        # --- OPTIMIZATION STEP 3: Save with Pillow's compression engine ---
+        optimized_frames[0].save(
             output_gif_path,
             save_all=True,
-            append_images=frames[1:],
-            duration=frame_delay,  # Duration of each frame in milliseconds
-            loop=0                 # 0 means loop infinitely
+            append_images=optimized_frames[1:],
+            duration=frame_delay,
+            loop=0,
+            optimize=True  # <-- Crucial: Removes redundant pixel data between frames
         )
-        print("Done!")
-    else:
-        print("Failed to capture frames.")
+        
+        # Check the final file size
+        file_size_mb = os.path.getsize(output_gif_path) / (1024 * 1024)
+        print(f"Done! Final File Size: {file_size_mb:.2f} MB")
+        
+        if file_size_mb > 1.0:
+            print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration_seconds.")
 
 # --- Usage Example ---
 convert_animated_svg_to_gif(
     svg_path="banner.svg", 
     output_gif_path="perfect_animation.gif", 
-    duration_seconds=4.0,  # Match this roughly to your SVG's animation cycle
-    fps=25                 # Standard smooth animation frame rate
+    duration_seconds=2.8,  # Match this roughly to your SVG's animation cycle
+    fps=8                 # Standard smooth animation frame rate
 )
