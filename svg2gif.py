@@ -113,7 +113,7 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
         # GIFs compress poorly at high resolutions. 500-600px max width is ideal.
         MAX_WIDTH = 640 
         print("height before", frames[0].height)
-        print("aspect ratio before", frames[0].width/frames[0].height)
+        print(f"aspect ratio before: {(frames[0].width/frames[0].height):.4f}")
         first_frame = frames[0]
         if first_frame.width > MAX_WIDTH:
             scale_factor = MAX_WIDTH / first_frame.width
@@ -125,7 +125,7 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
         # Convert images to Palette mode ('P') with an adaptive 256-color map.
         # This reduces data size per frame dramatically.
         print("height after", frames[0].height)
-        print("aspect ratio after", frames[0].width/frames[0].height)
+        print(f"aspect ratio after: {(frames[0].width/frames[0].height):.4f}")
         optimized_frames = []
         for img in frames:
             # 'adaptive' creates a custom palette optimized for your SVG's exact colors
