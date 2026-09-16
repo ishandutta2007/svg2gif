@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from io import BytesIO
 from PIL import Image
@@ -149,10 +150,13 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
         if file_size_mb > 1.0:
             print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration_seconds.")
 
-# --- Usage Example ---
-convert_animated_svg_to_gif(
-    svg_path="banner.svg", 
-    output_gif_path="perfect_animation.gif", 
-    duration_seconds=2.8,  # Match this roughly to your SVG's animation cycle
-    fps=8                 # Standard smooth animation frame rate
-)
+
+if __name__ == "__main__":
+    banner_svg_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.getcwd(), "assets", "banner.svg")
+    out_gif = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), "assets", "social-preview.gif")
+    convert_animated_svg_to_gif(
+        svg_path=banner_svg_path, 
+        output_gif_path=out_gif, 
+        duration_seconds=2.8,  # Match this roughly to your SVG's animation cycle
+        fps=8                 # Standard smooth animation frame rate
+    )
