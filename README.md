@@ -89,7 +89,8 @@ svg2gif path/to/input.svg path/to/output.gif
 #### CLI Options
 
 ```text
-usage: svg2gif [-h] [-d DURATION] [-f FPS] [-w MAX_WIDTH] input output
+usage: svg2gif [-h] [-i INPUT] [-o OUTPUT] [-d DURATION] [-f FPS]
+               [-w MAX_WIDTH] [-s MAX_FILE_SIZE]
 
 Convert animated SVG files into optimized looping animated GIFs.
 
@@ -102,11 +103,20 @@ options:
   -f, --fps FPS         Frames per second (default: 30)
   -w, --max-width MAX_WIDTH
                         Maximum width for output GIF (default: 640)
+  -s, --max-file-size MAX_FILE_SIZE, --max-size MAX_FILE_SIZE
+                        Maximum output GIF file size in MB (e.g. 1.2 or 1.2MB).
+                        When set, overrides and ignores --fps and --duration to automatically
+                        calculate the optimal balanced (fps, duration) pair within this limit.
 ```
 
 Example with custom flags:
 ```bash
 svg2gif -i input.svg -o output.gif -d 5.0 -f 24 -w 800
+```
+
+Example with maximum file size constraint (auto-calculates optimal FPS and duration):
+```bash
+svg2gif -i input.svg -o output.gif -s 1.2
 ```
 
 ---
@@ -118,12 +128,21 @@ You can also import and use `svg2gif` in your Python scripts:
 ```python
 from svg2gif import convert_animated_svg_to_gif
 
+# Basic usage
 convert_animated_svg_to_gif(
     svg_path="input.svg",
     output_gif_path="output.gif",
     duration_seconds=3.0,  # Duration of the capture loop in seconds
     fps=30,                # Frames per second
     max_width=640          # Optional max width resizing
+)
+
+# Auto-optimized by maximum file size (ignores fps and duration)
+convert_animated_svg_to_gif(
+    svg_path="input.svg",
+    output_gif_path="output.gif",
+    max_file_size=1.2,     # Target limit in MB (e.g. 1.2 or '800KB')
+    max_width=640
 )
 ```
 
