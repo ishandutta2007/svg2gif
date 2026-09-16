@@ -37,13 +37,25 @@ git clone https://github.com/ishandutta2007/svg2gif.git
 cd svg2gif
 ```
 
-### 2. Set up a virtual environment (recommended)
+### 2. Set up an isolated environment
+
+#### Option 1: Standard `venv`
 ```bash
 python -m venv venv
 # On Windows:
 venv\Scripts\activate
 # On Linux/macOS:
 source venv/bin/activate
+```
+
+#### Option 2: `pyenv` / `pyenv-virtualenv`
+```bash
+# Install desired Python version and create virtualenv
+pyenv install 3.11.9  # or any supported Python 3.7+ version
+pyenv virtualenv 3.11.9 svg2gif-env
+
+# Activate for current directory
+pyenv local svg2gif-env
 ```
 
 ### 3. Install in editable mode

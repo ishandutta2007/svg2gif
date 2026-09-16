@@ -1,10 +1,11 @@
 *.bak
 *.bk
+*.egg-info
 *.env
 *.json
 .cache
 __pycache__/
 contributors.txt
+ishandutta2007_svg2gif_stargazers.csv
 node_modules
 temp_repo_clone
-ishandutta2007_svg2gif_stargazers.csv
