@@ -1,6 +1,6 @@
 # svg2gif 🎨➡️🎬
 
-A high-performance Python tool for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
+A high-performance CLI tool & Python library for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
 
 ---
 
@@ -12,24 +12,19 @@ A high-performance Python tool for converting animated SVG files into optimized,
   - **Downscaling**: Automatically resizes large SVGs to ideal max-width parameters for smaller file outputs.
   - **Palette Quantization**: Applies 256-color adaptive palette conversion per frame.
   - **Frame Compression**: Leverages Pillow's optimization to discard redundant frame data.
-- **CLI & Module Support**: Run directly via command-line arguments or import into Python scripts.
+- **CLI & Module Support**: Installable via `pip` and runnable directly from the command line.
 
 ---
 
 ## 🛠️ Installation
 
-### 1. Clone the repository
+Install the package directly from PyPI (or locally):
+
 ```bash
-git clone https://github.com/ishandutta2007/svg2gif.git
-cd svg2gif
+pip install svg2gif
 ```
 
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Install Playwright browser binaries
+Install the Playwright browser binaries required for rendering:
 ```bash
 playwright install chromium
 ```
@@ -38,17 +33,44 @@ playwright install chromium
 
 ## 🚀 Usage
 
-### Command Line
+### Command Line Interface (CLI)
 
-Run `svg2gif.py` directly by supplying input SVG and output GIF paths:
+Once installed, use the `svg2gif` CLI binary anywhere:
 
 ```bash
-python svg2gif.py path/to/input.svg path/to/output.gif
+svg2gif path/to/input.svg path/to/output.gif
 ```
 
-If no arguments are provided, it defaults to converting `assets/banner.svg` into `assets/social-preview.gif`.
+#### CLI Options
+
+```text
+usage: svg2gif [-h] [-d DURATION] [-f FPS] [-w MAX_WIDTH] input output
+
+Convert animated SVG files into optimized looping animated GIFs.
+
+positional arguments:
+  input                 Path to input .svg file
+  output                Path to output .gif file
+
+options:
+  -h, --help            show this help message and exit
+  -d, --duration DURATION
+                        Duration of the animation capture loop in seconds (default: 3.0)
+  -f, --fps FPS         Frames per second (default: 30)
+  -w, --max-width MAX_WIDTH
+                        Maximum width for output GIF (default: 640)
+```
+
+Example with custom flags:
+```bash
+svg2gif input.svg output.gif -d 5.0 -f 24 -w 800
+```
+
+---
 
 ### Python API
+
+You can also import and use `svg2gif` in your Python scripts:
 
 ```python
 from svg2gif import convert_animated_svg_to_gif
@@ -57,18 +79,31 @@ convert_animated_svg_to_gif(
     svg_path="input.svg",
     output_gif_path="output.gif",
     duration_seconds=3.0,  # Duration of the capture loop in seconds
-    fps=30                 # Frames per second
+    fps=30,                # Frames per second
+    max_width=640          # Optional max width resizing
 )
 ```
 
 ---
 
-## ⚙️ How It Works
+## 📦 Building & Publishing to PyPI
 
-1. **SVG Analysis**: Parses the SVG XML to retrieve viewBox or width/height attributes.
-2. **Headless Execution**: Loads the SVG inside a headless Chromium page.
-3. **Frame Capture Loop**: Takes sequential in-memory screenshots synchronized to the target FPS.
-4. **GIF Compilation**: Downscales frame dimensions if necessary, applies adaptive palette quantization, and exports an optimized looping GIF.
+To build distribution packages and publish to PyPI:
+
+1. Install build tools:
+   ```bash
+   pip install build twine
+   ```
+
+2. Build source archive and wheel:
+   ```bash
+   python -m build
+   ```
+
+3. Upload package to PyPI:
+   ```bash
+   twine upload dist/*
+   ```
 
 ---
 
@@ -86,4 +121,3 @@ This project is licensed under the MIT License - see the [LICENSE](file:///C:/Us
     <img alt="Star History Chart" src="assets/ishandutta2007_svg2gif_growth.svg">
   </picture>
 </a>
-

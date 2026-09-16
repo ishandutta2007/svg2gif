@@ -1,44 +1,67 @@
+"""
+svg2gif - A CLI tool and Python library for converting animated SVG files into optimized animated GIFs.
+"""
+
 import os
 import sys
 import time
+import argparse
 from io import BytesIO
 from PIL import Image
 from playwright.sync_api import sync_playwright
 import xml.etree.ElementTree as ET
 
-def print_svg_aspect_ratio(file_path):
-    # Parse the SVG file
+def get_svg_dimensions(file_path):
+    """Parses SVG to find viewBox or width/height dimensions."""
     tree = ET.parse(file_path)
     root = tree.getroot()
     
-    # Strip namespace if present (e.g., '{http://w3.org}svg')
     tag = root.tag.split('}')[-1]
     if tag != 'svg':
-        print("Error: Not a valid SVG root element.")
-        return
+        return None, None
 
-    # Check for viewBox first (most reliable for aspect ratio)
     viewbox = root.get('viewBox')
     if viewbox:
-        _, _, w, h = map(float, viewbox.replace(',', ' ').split())
-    else:
-        # Fallback to width and height attributes
+        try:
+            parts = [float(x) for x in viewbox.replace(',', ' ').split() if x]
+            if len(parts) >= 4:
+                return parts[2], parts[3]
+        except ValueError:
+            pass
+
+    try:
         w = float(root.get('width', 0).replace('px', ''))
         h = float(root.get('height', 0).replace('px', ''))
+        if w > 0 and h > 0:
+            return w, h
+    except ValueError:
+        pass
 
-    if w > 0 and h > 0:
+    return None, None
+
+def print_svg_aspect_ratio(file_path):
+    w, h = get_svg_dimensions(file_path)
+    if w and h:
         ratio = w / h
         print(f"SVG Width: {w}, Height: {h}")
         print(f"SVG Aspect Ratio (W/H): {ratio:.4f}")
     else:
         print("SVG: Could not determine valid dimensions or viewBox.")
 
-def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0, fps=30):
+def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0, fps=30, max_width=640):
     """
     Renders an animated SVG in a headless browser, captures frames, 
-    and saves them as an animated GIF.
+    and saves them as an optimized animated GIF.
+
+    :param svg_path: Path to the source input SVG file.
+    :param output_gif_path: Target path for the output GIF file.
+    :param duration_seconds: Capture duration in seconds (default: 3.0).
+    :param fps: Frames captured per second (default: 30).
+    :param max_width: Max pixel width for output GIF downscaling (default: 640).
     """
-    # Read the SVG content
+    if not os.path.exists(svg_path):
+        raise FileNotFoundError(f"Input SVG file not found: {svg_path}")
+
     print_svg_aspect_ratio(svg_path)
     with open(svg_path, "r", encoding="utf-8") as f:
         svg_content = f.read()
@@ -90,15 +113,12 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
         # Capture the image sequence loop
         start_time = time.time()
         for i in range(total_frames):
-            # Take in-memory screenshot of the exact element bounds
             screenshot_bytes = page.locator("svg").screenshot(omit_background=True)
             img = Image.open(BytesIO(screenshot_bytes))
             
-            # GIFs do not support true alpha channels well, so convert to Palette mode
-            # If your SVG relies on transparent background, remove the .convert("RGB")
             frames.append(img.convert("RGB"))
             
-            # Calculate dynamic wait to maintain targeting FPS pace
+            # Calculate dynamic wait to maintain target FPS pace
             expected_time = start_time + (i + 1) / fps
             sleep_time = expected_time - time.time()
             if sleep_time > 0:
@@ -110,28 +130,23 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
     if frames:
         print(f"Compiling and compressing frames into {output_gif_path}...")
         
-        # --- OPTIMIZATION STEP 1: Downscale dimensions if the source is massive ---
-        # GIFs compress poorly at high resolutions. 500-600px max width is ideal.
-        MAX_WIDTH = 640 
-        print("height before", frames[0].height)
-        print(f"aspect ratio before: {(frames[0].width/frames[0].height):.4f}")
+        # --- OPTIMIZATION STEP 1: Downscale dimensions if requested ---
         first_frame = frames[0]
-        if first_frame.width > MAX_WIDTH:
-            scale_factor = MAX_WIDTH / first_frame.width
-            print("scale_factor", scale_factor)
-            new_size = (MAX_WIDTH, int(first_frame.height * scale_factor))
+        if max_width and first_frame.width > max_width:
+            scale_factor = max_width / first_frame.width
+            new_size = (max_width, int(first_frame.height * scale_factor))
             frames = [img.resize(new_size, Image.Resampling.LANCZOS) for img in frames]
 
         # --- OPTIMIZATION STEP 2: Quantize and Optimize Palette ---
-        # Convert images to Palette mode ('P') with an adaptive 256-color map.
-        # This reduces data size per frame dramatically.
-        print("height after", frames[0].height)
-        print(f"aspect ratio after: {(frames[0].width/frames[0].height):.4f}")
         optimized_frames = []
         for img in frames:
-            # 'adaptive' creates a custom palette optimized for your SVG's exact colors
             paletted_img = img.convert("P", palette=Image.Palette.ADAPTIVE, colors=256)
             optimized_frames.append(paletted_img)
+
+        # Ensure target output directory exists
+        out_dir = os.path.dirname(os.path.abspath(output_gif_path))
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
 
         # --- OPTIMIZATION STEP 3: Save with Pillow's compression engine ---
         optimized_frames[0].save(
@@ -140,23 +155,47 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
             append_images=optimized_frames[1:],
             duration=frame_delay,
             loop=0,
-            optimize=True  # <-- Crucial: Removes redundant pixel data between frames
+            optimize=True
         )
         
-        # Check the final file size
         file_size_mb = os.path.getsize(output_gif_path) / (1024 * 1024)
         print(f"Done! Final File Size: {file_size_mb:.2f} MB")
         
         if file_size_mb > 1.0:
-            print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration_seconds.")
+            print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration.")
 
+def main():
+    parser = argparse.ArgumentParser(
+        description="Convert animated SVG files into optimized looping animated GIFs."
+    )
+    parser.add_argument("input", help="Path to input .svg file")
+    parser.add_argument("output", help="Path to output .gif file")
+    parser.add_argument(
+        "-d", "--duration", type=float, default=3.0,
+        help="Duration of the animation capture loop in seconds (default: 3.0)"
+    )
+    parser.add_argument(
+        "-f", "--fps", type=int, default=30,
+        help="Frames per second (default: 30)"
+    )
+    parser.add_argument(
+        "-w", "--max-width", type=int, default=640,
+        help="Maximum width for output GIF (default: 640)"
+    )
+
+    args = parser.parse_args()
+    
+    try:
+        convert_animated_svg_to_gif(
+            svg_path=args.input,
+            output_gif_path=args.output,
+            duration_seconds=args.duration,
+            fps=args.fps,
+            max_width=args.max_width
+        )
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    banner_svg_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.getcwd(), "assets", "banner.svg")
-    out_gif = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), "assets", "social-preview.gif")
-    convert_animated_svg_to_gif(
-        svg_path=banner_svg_path, 
-        output_gif_path=out_gif, 
-        duration_seconds=2.8,  # Match this roughly to your SVG's animation cycle
-        fps=8                 # Standard smooth animation frame rate
-    )
+    main()
