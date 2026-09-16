@@ -18,13 +18,46 @@ A high-performance CLI tool & Python library for converting animated SVG files i
 
 ## 🛠️ Installation
 
-Install the package directly from PyPI (or locally):
+### Option A: From PyPI
 
 ```bash
 pip install svg2gif
+playwright install chromium
 ```
 
-Install the Playwright browser binaries required for rendering:
+---
+
+## 💻 Developer Setup / Installing from Source
+
+If you want to contribute, modify the code, or install directly from the source repository:
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/ishandutta2007/svg2gif.git
+cd svg2gif
+```
+
+### 2. Set up a virtual environment (recommended)
+```bash
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+```
+
+### 3. Install in editable mode
+Installing in editable (`-e`) mode lets you run `svg2gif` as a CLI command while immediately reflecting any code changes you make:
+```bash
+pip install -e .
+```
+
+Alternatively, install dependencies via `requirements.txt`:
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Install Playwright Chromium browser
 ```bash
 playwright install chromium
 ```
