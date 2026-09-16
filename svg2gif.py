@@ -59,6 +59,7 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
     :param fps: Frames captured per second (default: 30).
     :param max_width: Max pixel width for output GIF downscaling (default: 640).
     """
+    print(f"Converting {svg_path} to {output_gif_path}")
     if not os.path.exists(svg_path):
         raise FileNotFoundError(f"Input SVG file not found: {svg_path}")
 
@@ -168,8 +169,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Convert animated SVG files into optimized looping animated GIFs."
     )
-    parser.add_argument("input", help="Path to input .svg file")
-    parser.add_argument("output", help="Path to output .gif file")
+    parser.add_argument("-i", "--input", default=os.path.join(os.getcwd(), "assets", "banner.svg"), help="Path to input .svg file")
+    parser.add_argument("-o", "--output", default=os.path.join(os.getcwd(), "assets", "social-preview.gif"), help="Path to output .gif file")
     parser.add_argument(
         "-d", "--duration", type=float, default=3.0,
         help="Duration of the animation capture loop in seconds (default: 3.0)"
@@ -184,7 +185,6 @@ def main():
     )
 
     args = parser.parse_args()
-    
     try:
         convert_animated_svg_to_gif(
             svg_path=args.input,

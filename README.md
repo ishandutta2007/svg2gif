@@ -93,11 +93,9 @@ usage: svg2gif [-h] [-d DURATION] [-f FPS] [-w MAX_WIDTH] input output
 
 Convert animated SVG files into optimized looping animated GIFs.
 
-positional arguments:
-  input                 Path to input .svg file
-  output                Path to output .gif file
-
 options:
+  -i, --input           Path to input .svg file
+  -o, --output          Path to output .gif file
   -h, --help            show this help message and exit
   -d, --duration DURATION
                         Duration of the animation capture loop in seconds (default: 3.0)
@@ -108,7 +106,7 @@ options:
 
 Example with custom flags:
 ```bash
-svg2gif input.svg output.gif -d 5.0 -f 24 -w 800
+svg2gif -i input.svg -o output.gif -d 5.0 -f 24 -w 800
 ```
 
 ---
