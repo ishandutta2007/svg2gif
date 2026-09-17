@@ -24,6 +24,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/ishandutta2007/svg2gif"
 Repository = "https://github.com/ishandutta2007/svg2gif"
+Documentation = "https://github.com/ishandutta2007/svg2gif#readme"
+Issues = "https://github.com/ishandutta2007/svg2gif/issues"
 
 [project.scripts]
 svg2gif = "svg2gif:main"
