@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="svg2gifpy Banner" width="100%">
+</p>
+
 # svg2gifpy (svg2gif) 🎨➡️🎬
 
 A high-performance CLI tool & Python library for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
