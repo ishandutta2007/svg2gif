@@ -419,7 +419,7 @@ def handle_interactive_completion(repo_url: str, sponsor_url: str):
     prompt_bar = (
         "  \x1b[1;36m[1] Open GitHub Repo\x1b[0m   "
         "\x1b[1;32m[2] Sponsor / Coffee\x1b[0m   "
-        "\x1b[90m[Enter to skip]\x1b[0m: "
+        "\x1b[90m[Enter to exit]\x1b[0m: "
     )
     print(prompt_bar, end="", flush=True)
 
@@ -510,8 +510,10 @@ def handle_interactive_completion(repo_url: str, sponsor_url: str):
             start_time = time.time()
             records = (INPUT_RECORD * 1)()
             num_read = wintypes.DWORD()
+            last_click_time = 0.0
+            prev_button_state = False
 
-            while time.time() - start_time < 15.0:
+            while time.time() - start_time < 30.0:
                 res = kernel32.WaitForSingleObject(hConIn, 50)
                 if res == 0:  # WAIT_OBJECT_0
                     num_events = wintypes.DWORD()
@@ -525,38 +527,74 @@ def handle_interactive_completion(repo_url: str, sponsor_url: str):
                             if key.bKeyDown:
                                 ch = key.uChar
                                 if ch in ('1', 's', 'S'):
-                                    opened = ("GitHub Repository", repo_url)
-                                    break
+                                    start_time = time.time()
+                                    print(f"\r  \x1b[32m✔ Opened GitHub Repo!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                    try:
+                                        webbrowser.open(repo_url)
+                                    except Exception:
+                                        pass
                                 elif ch in ('2', 'c', 'C'):
-                                    opened = ("Sponsor Dashboard", sponsor_url)
-                                    break
+                                    start_time = time.time()
+                                    print(f"\r  \x1b[32m✔ Opened Sponsor Dashboard!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                    try:
+                                        webbrowser.open(sponsor_url)
+                                    except Exception:
+                                        pass
                                 elif ch in ('\r', '\n', '\x1b', 'q', 'Q', ' '):
                                     break
                         elif rec.EventType == 2:  # MOUSE_EVENT
                             mouse = rec.Event.MouseEvent
-                            # Detect mouse button click (left or right click, single or double click)
-                            if (mouse.dwButtonState & 0x0001) or (mouse.dwButtonState & 0x0002):
+                            is_pressed = bool((mouse.dwButtonState & 0x0001) or (mouse.dwButtonState & 0x0002))
+                            now = time.time()
+                            # Trigger only on new button press with debounce
+                            if is_pressed and not prev_button_state and (now - last_click_time > 0.4):
+                                last_click_time = now
+                                start_time = now  # Reset idle timeout on activity
                                 click_x = mouse.dwMousePosition.X
                                 click_y = mouse.dwMousePosition.Y
-                                # Check where user clicked
+
                                 if prompt_y >= 0 and click_y == prompt_y:
                                     if click_x < 26:
-                                        opened = ("GitHub Repository", repo_url)
+                                        print(f"\r  \x1b[32m✔ Opened GitHub Repo!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                        try:
+                                            webbrowser.open(repo_url)
+                                        except Exception:
+                                            pass
                                     elif click_x < 52:
-                                        opened = ("Sponsor Dashboard", sponsor_url)
+                                        print(f"\r  \x1b[32m✔ Opened Sponsor Dashboard!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                        try:
+                                            webbrowser.open(sponsor_url)
+                                        except Exception:
+                                            pass
                                     else:
-                                        break  # [Enter to skip] clicked
+                                        # [Enter to exit] clicked
+                                        break
                                 elif prompt_y >= 0 and click_y in (prompt_y - 2, prompt_y - 3):
-                                    opened = ("Sponsor Dashboard", sponsor_url)
+                                    print(f"\r  \x1b[32m✔ Opened Sponsor Dashboard!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                    try:
+                                        webbrowser.open(sponsor_url)
+                                    except Exception:
+                                        pass
                                 elif prompt_y >= 0 and click_y in (prompt_y - 4, prompt_y - 5):
-                                    opened = ("GitHub Repository", repo_url)
+                                    print(f"\r  \x1b[32m✔ Opened GitHub Repo!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                    try:
+                                        webbrowser.open(repo_url)
+                                    except Exception:
+                                        pass
                                 else:
-                                    # Click anywhere else on the thank-you box
                                     if click_x >= 26 and click_x < 52:
-                                        opened = ("Sponsor Dashboard", sponsor_url)
+                                        print(f"\r  \x1b[32m✔ Opened Sponsor Dashboard!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                        try:
+                                            webbrowser.open(sponsor_url)
+                                        except Exception:
+                                            pass
                                     else:
-                                        opened = ("GitHub Repository", repo_url)
-                                break
+                                        print(f"\r  \x1b[32m✔ Opened GitHub Repo!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                                        try:
+                                            webbrowser.open(repo_url)
+                                        except Exception:
+                                            pass
+                            prev_button_state = is_pressed
 
             # Restore original console mode
             if hConIn and hConIn != -1 and orig_mode.value:
@@ -566,27 +604,35 @@ def handle_interactive_completion(repo_url: str, sponsor_url: str):
                 kernel32.CloseHandle(hConOut)
         else:
             import select
-            r, _, _ = select.select([sys.stdin], [], [], 15.0)
-            if r:
-                line = sys.stdin.readline().strip().lower()
-                if line in ("1", "s", "repo"):
-                    opened = ("GitHub Repository", repo_url)
-                elif line in ("2", "c", "sponsor", "coffee"):
-                    opened = ("Sponsor Dashboard", sponsor_url)
+            start_time = time.time()
+            while time.time() - start_time < 30.0:
+                r, _, _ = select.select([sys.stdin], [], [], 30.0)
+                if r:
+                    line = sys.stdin.readline().strip().lower()
+                    if line in ("1", "s", "repo"):
+                        start_time = time.time()
+                        print(f"\r  \x1b[32m✔ Opened GitHub Repo!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                        try:
+                            webbrowser.open(repo_url)
+                        except Exception:
+                            pass
+                    elif line in ("2", "c", "sponsor", "coffee"):
+                        start_time = time.time()
+                        print(f"\r  \x1b[32m✔ Opened Sponsor Dashboard!\x1b[0m   [1] Open GitHub Repo   [2] Sponsor / Coffee   \x1b[90m[Enter to exit]\x1b[0m: ", end="", flush=True)
+                        try:
+                            webbrowser.open(sponsor_url)
+                        except Exception:
+                            pass
+                    else:
+                        break
+                else:
+                    break
     except Exception:
         pass
     finally:
-        # Disable SGR mouse tracking and print newline
-        sys.stdout.write("\x1b[?1006l\x1b[?1000l\n")
+        # Disable SGR mouse tracking and print clean newline
+        sys.stdout.write("\x1b[?1006l\x1b[?1000l\r\x1b[K\n")
         sys.stdout.flush()
-
-    if opened:
-        label, url = opened
-        print(f"Opening {label} in your default browser ({url})...")
-        try:
-            webbrowser.open(url)
-        except Exception:
-            pass
 
 
 def main():
