@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/svg2gif
+      url: https://pypi.org/p/svg2gifpy
 
     steps:
       - name: Checkout repository
@@ -31,24 +31,28 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Extract package version from pyproject.toml
-        id: pkg_version
+      - name: Extract package name and version from pyproject.toml
+        id: pkg_info
         run: |
-          VERSION=$(python -c "
+          INFO=$(python -c "
           import tomllib
           with open('pyproject.toml', 'rb') as f:
               data = tomllib.load(f)
-          print(data['project']['version'])
+          print(f\"{data['project']['name']}|{data['project']['version']}\")
           ")
+          PKG_NAME=$(echo "$INFO" | cut -d'|' -f1)
+          VERSION=$(echo "$INFO" | cut -d'|' -f2)
+          echo "pkg_name=$PKG_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Found package version: $VERSION"
+          echo "Package: $PKG_NAME, Version: $VERSION"
 
       - name: Check if version is already published on PyPI
         id: pypi_check
         run: |
-          VERSION="${{ steps.pkg_version.outputs.version }}"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/svg2gif/${VERSION}/json")
-          echo "PyPI check for svg2gif==${VERSION} returned HTTP ${HTTP_STATUS}"
+          PKG_NAME="${{ steps.pkg_info.outputs.pkg_name }}"
+          VERSION="${{ steps.pkg_info.outputs.version }}"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/${PKG_NAME}/${VERSION}/json")
+          echo "PyPI check for ${PKG_NAME}==${VERSION} returned HTTP ${HTTP_STATUS}"
           if [ "$HTTP_STATUS" = "200" ]; then
             echo "Version ${VERSION} already exists on PyPI. Skipping publication."
             echo "should_publish=false" >> $GITHUB_OUTPUT
@@ -86,8 +90,8 @@ jobs:
         if: steps.pypi_check.outputs.should_publish == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v${{ steps.pkg_version.outputs.version }}"
-          name: "v${{ steps.pkg_version.outputs.version }}"
+          tag_name: "v${{ steps.pkg_info.outputs.version }}"
+          name: "v${{ steps.pkg_info.outputs.version }}"
           files: dist/*
           generate_release_notes: true
         env:

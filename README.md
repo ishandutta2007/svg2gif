@@ -1,6 +1,8 @@
-# svg2gif 🎨➡️🎬
+# svg2gifpy (svg2gif) 🎨➡️🎬
 
 A high-performance CLI tool & Python library for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
+
+> **PyPI Package**: [`svg2gifpy`](https://pypi.org/project/svg2gifpy/) (provides both `svg2gif` and `svg2gifpy` CLI and Python module imports)
 
 ---
 
@@ -12,9 +14,8 @@ A high-performance CLI tool & Python library for converting animated SVG files i
   - **Downscaling**: Automatically resizes large SVGs to ideal max-width parameters for smaller file outputs.
   - **Palette Quantization**: Applies 256-color adaptive palette conversion per frame.
   - **Frame Compression**: Leverages Pillow's optimization to discard redundant frame data.
-- **CLI & Module Support**: Installable via `pip` and runnable directly from the command line.
-
----
+- **Max File Size Targeting (`-s`)**: Automatically chooses the ideal balanced (FPS, duration) pair to maximize quality within a target file size.
+- **CLI & Module Support**: Installable via `pip install svg2gifpy` and runnable directly from the command line (`svg2gif` or `svg2gifpy`).
 
 ---
 
@@ -30,19 +31,19 @@ A high-performance CLI tool & Python library for converting animated SVG files i
 
 ### 1. Installation
 
-Install `svg2gif` directly from PyPI and ensure the Playwright Chromium browser binary is available:
+Install `svg2gifpy` from PyPI and ensure the Playwright Chromium browser binary is installed:
 
 ```bash
-pip install svg2gif
+pip install svg2gifpy
 playwright install chromium
 ```
 
 ### 2. Command Line Interface (CLI)
 
-Use the `svg2gif` CLI to convert SVG files from your terminal:
+Use the CLI binary (`svg2gif` or `svg2gifpy`) to convert SVG files from your terminal:
 
 ```bash
-# Basic conversion
+# Basic conversion (svg2gif and svg2gifpy commands are both available)
 svg2gif -i path/to/input.svg -o path/to/output.gif
 ```
 
@@ -89,10 +90,11 @@ options:
 
 ### 3. Python API
 
-Import `svg2gif` into your Python applications:
+Import `svg2gif` (or `svg2gifpy`) into your Python applications:
 
 ```python
 from svg2gif import convert_animated_svg_to_gif
+# Alternatively: from svg2gifpy import convert_animated_svg_to_gif
 
 # Basic conversion with explicit duration and FPS
 convert_animated_svg_to_gif(
@@ -169,13 +171,13 @@ CI workflows in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) will auto
 The repository includes a fully automated release pipeline in [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
 
 Whenever you increment the version in [`pyproject.toml`](pyproject.toml) and push to the `main` branch, the workflow:
-1. **Reads version**: Automatically parses the `version` field from `pyproject.toml`.
-2. **Checks PyPI**: Checks the official PyPI JSON API to determine if `svg2gif==<version>` already exists:
+1. **Reads package name and version**: Automatically parses the `name` (`svg2gifpy`) and `version` fields from `pyproject.toml`.
+2. **Checks PyPI**: Checks the official PyPI JSON API to determine if `svg2gifpy==<version>` already exists:
    - If the version **already exists**: It skips publishing safely (idempotent; no duplicate release errors).
    - If the version is **new**: It executes the release pipeline.
 3. **Runs tests**: Runs the complete test suite against the target code.
 4. **Builds distribution**: Generates source archive (`.tar.gz`) and wheel (`.whl`) via `python -m build`.
-5. **Publishes to PyPI**: Uploads distributions to PyPI.
+5. **Publishes to PyPI**: Uploads distributions to PyPI under [`svg2gifpy`](https://pypi.org/project/svg2gifpy/).
 6. **Creates GitHub Release**: Generates a Git tag (`vX.Y.Z`) and GitHub Release with auto-generated release notes and attached distribution artifacts.
 
 ### 2. How to Release a New Version
@@ -185,7 +187,7 @@ To release a new version to PyPI:
 1. Bump the version in [`pyproject.toml`](pyproject.toml):
    ```toml
    [project]
-   name = "svg2gif"
+   name = "svg2gifpy"
    version = "0.2.0"  # <-- Increment version here
    ```
 2. Commit and push to `main`:
@@ -201,7 +203,7 @@ To release a new version to PyPI:
 The workflow supports both modern PyPI authentication methods:
 
 #### Option A: PyPI Trusted Publishing (OIDC) — *Recommended*
-1. Go to your PyPI project settings on [pypi.org](https://pypi.org/manage/project/svg2gif/settings/publishing/).
+1. Go to your PyPI project settings on [pypi.org](https://pypi.org/manage/project/svg2gifpy/settings/publishing/).
 2. Under **Publishing**, add a **Trusted Publisher**:
    - **Owner**: `ishandutta2007`
    - **Repository name**: `svg2gif`
@@ -210,7 +212,7 @@ The workflow supports both modern PyPI authentication methods:
 3. No secret tokens required!
 
 #### Option B: PyPI API Token Secret
-1. Create an API token on [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) with upload permissions for `svg2gif`.
+1. Create an API token on [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) with upload permissions for `svg2gifpy` (or entire account if first upload).
 2. In GitHub, navigate to **Settings** ➡️ **Secrets and variables** ➡️ **Actions**.
 3. Create a repository secret named `PYPI_API_TOKEN` and paste your token value (starting with `pypi-`).
 

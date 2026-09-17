@@ -105,5 +105,11 @@ class TestSvg2GifMaxFileSize(unittest.TestCase):
             if os.path.exists(out_gif):
                 os.remove(out_gif)
 
+    def test_svg2gifpy_alias_import(self):
+        import svg2gifpy
+        self.assertTrue(callable(svg2gifpy.convert_animated_svg_to_gif))
+        self.assertTrue(callable(svg2gifpy.main))
+        self.assertTrue(callable(svg2gifpy.parse_file_size))
+
 if __name__ == "__main__":
     unittest.main()

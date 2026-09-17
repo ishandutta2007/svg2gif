@@ -3,18 +3,17 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "svg2gif"
+name = "svg2gifpy"
 version = "0.1.0"
 authors = [
     { name = "Ishan Dutta" }
 ]
 description = "A CLI tool to convert animated SVG files into optimized animated GIFs using Playwright and Pillow."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
@@ -28,6 +27,7 @@ Repository = "https://github.com/ishandutta2007/svg2gif"
 
 [project.scripts]
 svg2gif = "svg2gif:main"
+svg2gifpy = "svg2gif:main"
 
 [tool.setuptools]
-py-modules = ["svg2gif"]
+py-modules = ["svg2gif", "svg2gifpy"]
