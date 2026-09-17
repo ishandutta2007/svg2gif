@@ -386,6 +386,19 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
             if file_size_mb > 1.0:
                 print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration.")
 
+def format_clickable_link(url: str, label: str | None = None) -> str:
+    """Format a URL as a clickable terminal hyperlink using ANSI OSC 8 escape sequences."""
+    if label is None:
+        label = url
+    if sys.platform == "win32":
+        try:
+            import os
+            os.system("")
+        except Exception:
+            pass
+    return f"\033]8;;{url}\033\\{label}\033]8;;\033\\"
+
+
 def main():
     default_input = os.path.join(os.getcwd(), "assets", "banner.svg")
     if not os.path.exists(default_input):
@@ -432,12 +445,15 @@ def main():
             max_width=args.max_width,
             max_file_size=args.max_file_size
         )
+        repo_link = format_clickable_link("https://github.com/ishandutta2007/svg2gif")
+        sponsor_link = format_clickable_link("https://github.com/sponsors/ishandutta2007")
+
         print("\n" + "=" * 60)
         print("Thank you for using svg2gifpy!")
         print("Found it helpful? Please star, fork & share the repo:")
-        print("   https://github.com/ishandutta2007/svg2gif")
+        print(f"   {repo_link}")
         print("Support development / Buy me a coffee:")
-        print("   https://github.com/sponsors/ishandutta2007")
+        print(f"   {sponsor_link}")
         print("=" * 60)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
