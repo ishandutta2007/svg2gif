@@ -11,6 +11,7 @@
   <a href="https://github.com/ishandutta2007/svg2gif/actions/workflows/ci.yml"><img src="https://github.com/ishandutta2007/svg2gif/actions/workflows/ci.yml/badge.svg" alt="CI Tests" /></a>
   <a href="https://github.com/ishandutta2007/svg2gif/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
   <a href="https://github.com/ishandutta2007/svg2gif/stargazers"><img src="https://img.shields.io/github/stars/ishandutta2007/svg2gif.svg?style=social" alt="GitHub Stars" /></a>
+  <a href="https://github.com/ishandutta2007"><img alt="GitHub followers" src="https://img.shields.io/github/followers/ishandutta2007?label=Follow" /></a>
 </p>
 
 A high-performance CLI tool & Python library for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
@@ -241,17 +242,20 @@ twine upload dist/*
 
 ---
 
-## 📄 License
+## 💖 Support & Sponsoring
 
-This project is licensed under the MIT License - see the [LICENSE](file:///C:/Users/ishan/Documents/Projects/svg2gif/LICENSE) file for details.
+Thank you for using **`svg2gifpy`**! If this tool saved you time or helped in your project, please consider giving it a ⭐ **Star** on [GitHub](https://github.com/ishandutta2007/svg2gif), forking the repository, and sharing it with your network.
+
+Your support keeps open-source software thriving! You can also support ongoing development or buy me a coffee via the [GitHub Sponsor Dashboard](https://github.com/sponsors/ishandutta2007).
 
 ---
 
-## ⭐ Star History
+## 📄 License
 
-<a href="https://star-history.com/#ishandutta2007/svg2gif&Timeline" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/ishandutta2007_svg2gif_growth.svg">
-    <img alt="Star History Chart" src="assets/ishandutta2007_svg2gif_growth.svg">
-  </picture>
-</a>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Star History
+
+[![Star History Chart](https://star-history.dera.page/svg?repos=ishandutta2007/svg2gif&type=date&legend=top-left)](https://star-history.dera.page/#ishandutta2007/svg2gif&type=date&legend=top-left)
