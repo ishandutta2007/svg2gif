@@ -7,6 +7,7 @@ import sys
 import re
 import math
 import time
+import webbrowser
 import argparse
 from io import BytesIO
 from PIL import Image
@@ -401,6 +402,104 @@ def format_clickable_link(url: str, label: str | None = None) -> str:
     return f"\x1b[4;36m\x1b]8;;{url}\x07{label}\x1b]8;;\x07\x1b[0m"
 
 
+def handle_interactive_completion(repo_url: str, sponsor_url: str):
+    """
+    Provides a generic, interactive completion experience across all terminals
+    (including legacy Windows conhost.exe, Windows Terminal, PowerShell 6/7, and POSIX terminals).
+    Allows opening links via single-key press ([1]/[s], [2]/[c]), mouse click (if supported),
+    or pressing Enter to skip. Bypasses automatically in non-interactive / CI environments.
+    """
+    if not (hasattr(sys, "stdin") and sys.stdin and sys.stdin.isatty() and
+            hasattr(sys, "stdout") and sys.stdout and sys.stdout.isatty()):
+        return
+
+    prompt_bar = (
+        "  \x1b[1;36m[1] Open GitHub Repo\x1b[0m   "
+        "\x1b[1;32m[2] Sponsor / Coffee\x1b[0m   "
+        "\x1b[90m[Enter to skip]\x1b[0m: "
+    )
+    print(prompt_bar, end="", flush=True)
+
+    # Enable SGR mouse tracking for terminals that support mouse click events
+    sys.stdout.write("\x1b[?1000h\x1b[?1006h")
+    sys.stdout.flush()
+
+    opened = None
+    try:
+        if sys.platform == "win32":
+            import msvcrt
+            orig_mode = None
+            try:
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                hStdin = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
+                mode_val = ctypes.c_uint32()
+                if kernel32.GetConsoleMode(hStdin, ctypes.byref(mode_val)):
+                    orig_mode = mode_val.value
+                    # Disable quick edit (0x0040), enable mouse input (0x0010) + extended flags (0x0080)
+                    new_mode = (orig_mode & ~0x0040) | 0x0080 | 0x0010
+                    kernel32.SetConsoleMode(hStdin, new_mode)
+            except Exception:
+                orig_mode = None
+
+            start_time = time.time()
+            # Wait up to 15 seconds for user keypress or mouse click
+            while time.time() - start_time < 15.0:
+                if msvcrt.kbhit():
+                    ch = msvcrt.getch()
+                    if ch in (b'\r', b'\n', b'\x1b', b'q', b'Q', b' '):
+                        break
+                    elif ch in (b'1', b's', b'S'):
+                        opened = ("GitHub Repository", repo_url)
+                        break
+                    elif ch in (b'2', b'c', b'C'):
+                        opened = ("Sponsor Dashboard", sponsor_url)
+                        break
+                    elif ch in (b'\x00', b'\xe0'):
+                        if msvcrt.kbhit():
+                            msvcrt.getch()
+                    elif ch == b'\x1b':
+                        # Check for mouse click escape sequence \x1b[<0;X;YM
+                        seq = b""
+                        while msvcrt.kbhit():
+                            seq += msvcrt.getch()
+                        if b"<" in seq and (b"M" in seq or b"m" in seq):
+                            opened = ("GitHub Repository", repo_url)
+                            break
+                    time.sleep(0.02)
+                else:
+                    time.sleep(0.05)
+
+            if orig_mode is not None:
+                try:
+                    kernel32.SetConsoleMode(hStdin, orig_mode)
+                except Exception:
+                    pass
+        else:
+            import select
+            r, _, _ = select.select([sys.stdin], [], [], 15.0)
+            if r:
+                line = sys.stdin.readline().strip().lower()
+                if line in ("1", "s", "repo"):
+                    opened = ("GitHub Repository", repo_url)
+                elif line in ("2", "c", "sponsor", "coffee"):
+                    opened = ("Sponsor Dashboard", sponsor_url)
+    except Exception:
+        pass
+    finally:
+        # Disable mouse tracking and move to next line
+        sys.stdout.write("\x1b[?1006l\x1b[?1000l\n")
+        sys.stdout.flush()
+
+    if opened:
+        label, url = opened
+        print(f"Opening {label} in your default browser ({url})...")
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
+
+
 def main():
     default_input = os.path.join(os.getcwd(), "assets", "banner.svg")
     if not os.path.exists(default_input):
@@ -457,6 +556,10 @@ def main():
         print("Support development / Buy me a coffee:")
         print(f"   {sponsor_link}  \x1b[90m(Ctrl+Click to open)\x1b[0m")
         print("=" * 60)
+        handle_interactive_completion(
+            repo_url="https://github.com/ishandutta2007/svg2gif",
+            sponsor_url="https://github.com/sponsors/ishandutta2007"
+        )
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
