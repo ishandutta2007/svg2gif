@@ -32,4 +32,5 @@ svg2gif = "svg2gif:main"
 svg2gifpy = "svg2gif:main"
 
 [tool.setuptools]
-py-modules = ["svg2gif", "svg2gifpy"]
+py-modules = ["svg2gif", "svg2gifpy", "cli_interactive"]
+

@@ -111,5 +111,17 @@ class TestSvg2GifMaxFileSize(unittest.TestCase):
         self.assertTrue(callable(svg2gifpy.main))
         self.assertTrue(callable(svg2gifpy.parse_file_size))
 
+    def test_cli_interactive_module(self):
+        import cli_interactive
+        link = cli_interactive.format_clickable_link("https://github.com/ishandutta2007/svg2gif")
+        self.assertIn("https://github.com/ishandutta2007/svg2gif", link)
+        self.assertIn("\x1b]8;;", link)
+
+        # Ensure handle_interactive_completion does not block in automated/non-interactive test runs
+        cli_interactive.handle_interactive_completion(
+            "https://github.com/ishandutta2007/svg2gif",
+            "https://github.com/sponsors/ishandutta2007"
+        )
+
 if __name__ == "__main__":
     unittest.main()
