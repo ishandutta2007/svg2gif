@@ -16,77 +16,37 @@ A high-performance CLI tool & Python library for converting animated SVG files i
 
 ---
 
-## 🛠️ Installation
+---
 
-### Option A: From PyPI
+## 👥 Guides by Audience
+
+- [1. 📖 For Users](#-for-users)
+- [2. 💻 For Developers & Contributors](#-for-developers--contributors)
+- [3. 🚀 For Package Publishers & DevOps](#-for-package-publishers--devops)
+
+---
+
+## 📖 For Users
+
+### 1. Installation
+
+Install `svg2gif` directly from PyPI and ensure the Playwright Chromium browser binary is available:
 
 ```bash
 pip install svg2gif
 playwright install chromium
 ```
 
----
+### 2. Command Line Interface (CLI)
 
-## 💻 Developer Setup / Installing from Source
-
-If you want to contribute, modify the code, or install directly from the source repository:
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/ishandutta2007/svg2gif.git
-cd svg2gif
-```
-
-### 2. Set up an isolated environment
-
-#### Option 1: Standard `venv`
-```bash
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-```
-
-#### Option 2: `pyenv` / `pyenv-virtualenv`
-```bash
-# Install desired Python version and create virtualenv
-pyenv install 3.11.9  # or any supported Python 3.7+ version
-pyenv virtualenv 3.11.9 svg2gif-env
-
-# Activate for current directory
-pyenv local svg2gif-env
-```
-
-### 3. Install in editable mode
-Installing in editable (`-e`) mode lets you run `svg2gif` as a CLI command while immediately reflecting any code changes you make:
-```bash
-pip install -e .
-```
-
-Alternatively, install dependencies via `requirements.txt`:
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Install Playwright Chromium browser
-```bash
-playwright install chromium
-```
-
----
-
-## 🚀 Usage
-
-### Command Line Interface (CLI)
-
-Once installed, use the `svg2gif` CLI binary anywhere:
+Use the `svg2gif` CLI to convert SVG files from your terminal:
 
 ```bash
-svg2gif path/to/input.svg path/to/output.gif
+# Basic conversion
+svg2gif -i path/to/input.svg -o path/to/output.gif
 ```
 
-#### CLI Options
+#### CLI Reference
 
 ```text
 usage: svg2gif [-h] [-i INPUT] [-o OUTPUT] [-d DURATION] [-f FPS]
@@ -95,52 +55,58 @@ usage: svg2gif [-h] [-i INPUT] [-o OUTPUT] [-d DURATION] [-f FPS]
 Convert animated SVG files into optimized looping animated GIFs.
 
 options:
-  -i, --input           Path to input .svg file
-  -o, --output          Path to output .gif file
   -h, --help            show this help message and exit
+  -i, --input INPUT     Path to input .svg file (default: assets/banner.svg)
+  -o, --output OUTPUT   Path to output .gif file (default: assets/social-preview.gif)
   -d, --duration DURATION
-                        Duration of the animation capture loop in seconds (default: 3.0)
-  -f, --fps FPS         Frames per second (default: 30)
+                        Duration of the animation capture loop in seconds (default: 3.0).
+                        Ignored if -s / --max-file-size is specified.
+  -f, --fps FPS         Frames per second (default: 30).
+                        Ignored if -s / --max-file-size is specified.
   -w, --max-width MAX_WIDTH
-                        Maximum width for output GIF (default: 640)
+                        Maximum width for output GIF downscaling (default: 640)
   -s, --max-file-size MAX_FILE_SIZE, --max-size MAX_FILE_SIZE
-                        Maximum output GIF file size in MB (e.g. 1.2 or 1.2MB).
+                        Maximum output GIF file size in MB (e.g. 1.2 or 1.2MB, 800KB).
                         When set, overrides and ignores --fps and --duration to automatically
                         calculate the optimal balanced (fps, duration) pair within this limit.
 ```
 
-Example with custom flags:
-```bash
-svg2gif -i input.svg -o output.gif -d 5.0 -f 24 -w 800
-```
+#### CLI Examples
 
-Example with maximum file size constraint (auto-calculates optimal FPS and duration):
-```bash
-svg2gif -i input.svg -o output.gif -s 1.2
-```
+- **Custom loop duration and frame rate:**
+  ```bash
+  svg2gif -i banner.svg -o banner.gif -d 4.0 -f 20 -w 800
+  ```
 
----
+- **Constrain to maximum file size (auto-calculates optimal FPS and duration):**
+  ```bash
+  # Max 1.2 MB output (automatically finds highest permissible frames with balanced FPS and loop duration)
+  svg2gif -i banner.svg -o banner.gif -s 1.2
 
-### Python API
+  # Using KB units
+  svg2gif -i banner.svg -o banner.gif -s 800KB
+  ```
 
-You can also import and use `svg2gif` in your Python scripts:
+### 3. Python API
+
+Import `svg2gif` into your Python applications:
 
 ```python
 from svg2gif import convert_animated_svg_to_gif
 
-# Basic usage
+# Basic conversion with explicit duration and FPS
 convert_animated_svg_to_gif(
-    svg_path="input.svg",
-    output_gif_path="output.gif",
-    duration_seconds=3.0,  # Duration of the capture loop in seconds
+    svg_path="banner.svg",
+    output_gif_path="banner.gif",
+    duration_seconds=3.0,  # Duration in seconds
     fps=30,                # Frames per second
-    max_width=640          # Optional max width resizing
+    max_width=640          # Downscale width if original exceeds 640px
 )
 
-# Auto-optimized by maximum file size (ignores fps and duration)
+# Auto-optimized conversion constrained by maximum file size
 convert_animated_svg_to_gif(
-    svg_path="input.svg",
-    output_gif_path="output.gif",
+    svg_path="banner.svg",
+    output_gif_path="banner.gif",
     max_file_size=1.2,     # Target limit in MB (e.g. 1.2 or '800KB')
     max_width=640
 )
@@ -148,24 +114,115 @@ convert_animated_svg_to_gif(
 
 ---
 
-## 📦 Building & Publishing to PyPI
+## 💻 For Developers & Contributors
 
-To build distribution packages and publish to PyPI:
+### 1. Clone Repository
 
-1. Install build tools:
-   ```bash
-   pip install build twine
+```bash
+git clone https://github.com/ishandutta2007/svg2gif.git
+cd svg2gif
+```
+
+### 2. Set Up Virtual Environment
+
+#### Standard `venv`:
+```bash
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+```
+
+#### Or with `pyenv`:
+```bash
+pyenv install 3.11.4
+pyenv virtualenv 3.11.4 svg2gif-env
+pyenv local svg2gif-env
+```
+
+### 3. Install in Editable Mode
+
+Install dependencies and link the package locally so edits are immediately reflected:
+
+```bash
+pip install -e .
+playwright install chromium
+```
+
+### 4. Running Tests
+
+Run the test suite locally before creating pull requests:
+
+```bash
+python -m unittest test_svg2gif.py
+```
+
+CI workflows in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) will automatically run tests across Python 3.9, 3.10, 3.11, and 3.12 on every push and pull request.
+
+---
+
+## 🚀 For Package Publishers & DevOps
+
+### 1. Automated PyPI Publishing on Push
+
+The repository includes a fully automated release pipeline in [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
+
+Whenever you increment the version in [`pyproject.toml`](pyproject.toml) and push to the `main` branch, the workflow:
+1. **Reads version**: Automatically parses the `version` field from `pyproject.toml`.
+2. **Checks PyPI**: Checks the official PyPI JSON API to determine if `svg2gif==<version>` already exists:
+   - If the version **already exists**: It skips publishing safely (idempotent; no duplicate release errors).
+   - If the version is **new**: It executes the release pipeline.
+3. **Runs tests**: Runs the complete test suite against the target code.
+4. **Builds distribution**: Generates source archive (`.tar.gz`) and wheel (`.whl`) via `python -m build`.
+5. **Publishes to PyPI**: Uploads distributions to PyPI.
+6. **Creates GitHub Release**: Generates a Git tag (`vX.Y.Z`) and GitHub Release with auto-generated release notes and attached distribution artifacts.
+
+### 2. How to Release a New Version
+
+To release a new version to PyPI:
+
+1. Bump the version in [`pyproject.toml`](pyproject.toml):
+   ```toml
+   [project]
+   name = "svg2gif"
+   version = "0.2.0"  # <-- Increment version here
    ```
-
-2. Build source archive and wheel:
+2. Commit and push to `main`:
    ```bash
-   python -m build
+   git add pyproject.toml
+   git commit -m "chore: bump version to 0.2.0"
+   git push origin main
    ```
+3. GitHub Actions handles the rest automatically! Monitor progress under the repository's **Actions** tab.
 
-3. Upload package to PyPI:
-   ```bash
-   twine upload dist/*
-   ```
+### 3. PyPI Authentication Setup
+
+The workflow supports both modern PyPI authentication methods:
+
+#### Option A: PyPI Trusted Publishing (OIDC) — *Recommended*
+1. Go to your PyPI project settings on [pypi.org](https://pypi.org/manage/project/svg2gif/settings/publishing/).
+2. Under **Publishing**, add a **Trusted Publisher**:
+   - **Owner**: `ishandutta2007`
+   - **Repository name**: `svg2gif`
+   - **Workflow name**: `publish.yml`
+   - **Environment name**: `pypi`
+3. No secret tokens required!
+
+#### Option B: PyPI API Token Secret
+1. Create an API token on [pypi.org/manage/account/token/](https://pypi.org/manage/account/token/) with upload permissions for `svg2gif`.
+2. In GitHub, navigate to **Settings** ➡️ **Secrets and variables** ➡️ **Actions**.
+3. Create a repository secret named `PYPI_API_TOKEN` and paste your token value (starting with `pypi-`).
+
+### 4. Manual Publishing Fallback
+
+If you ever need to publish manually from your local machine:
+
+```bash
+pip install build twine
+python -m build
+twine upload dist/*
+```
 
 ---
 
