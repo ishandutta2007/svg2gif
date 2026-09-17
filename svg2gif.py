@@ -396,9 +396,9 @@ def format_clickable_link(url: str, label: str | None = None) -> str:
             os.system("")
         except Exception:
             pass
-    # \x1b]8;;URL\x07 renders hyperlink in OSC 8 terminals (Windows Terminal, VS Code, etc.)
     # \x1b[4;36m renders cyan underlined text in ANSI terminals (PowerShell 6/7, ConHost, etc.)
-    return f"\x1b]8;;{url}\x07\x1b[4;36m{label}\x1b[0m\x1b]8;;\x07"
+    # \x1b]8;;URL\x07 renders hyperlink in OSC 8 terminals (Windows Terminal, VS Code, etc.)
+    return f"\x1b[4;36m\x1b]8;;{url}\x07{label}\x1b]8;;\x07\x1b[0m"
 
 
 def main():
@@ -453,9 +453,9 @@ def main():
         print("\n" + "=" * 60)
         print("Thank you for using svg2gifpy!")
         print("Found it helpful? Please star, fork & share the repo:")
-        print(f"   {repo_link}")
+        print(f"   {repo_link}  \x1b[90m(Ctrl+Click to open)\x1b[0m")
         print("Support development / Buy me a coffee:")
-        print(f"   {sponsor_link}")
+        print(f"   {sponsor_link}  \x1b[90m(Ctrl+Click to open)\x1b[0m")
         print("=" * 60)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
