@@ -387,7 +387,7 @@ def convert_animated_svg_to_gif(svg_path, output_gif_path, duration_seconds=3.0,
                 print("⚠️ Warning: File is still over 1MB. Reduce FPS or total duration.")
 
 def format_clickable_link(url: str, label: str | None = None) -> str:
-    """Format a URL as a clickable terminal hyperlink using ANSI OSC 8 escape sequences."""
+    """Format a URL as a styled clickable terminal hyperlink using ANSI OSC 8 escape sequences and SGR styling."""
     if label is None:
         label = url
     if sys.platform == "win32":
@@ -396,7 +396,9 @@ def format_clickable_link(url: str, label: str | None = None) -> str:
             os.system("")
         except Exception:
             pass
-    return f"\033]8;;{url}\033\\{label}\033]8;;\033\\"
+    # \x1b]8;;URL\x07 renders hyperlink in OSC 8 terminals (Windows Terminal, VS Code, etc.)
+    # \x1b[4;36m renders cyan underlined text in ANSI terminals (PowerShell 6/7, ConHost, etc.)
+    return f"\x1b]8;;{url}\x07\x1b[4;36m{label}\x1b[0m\x1b]8;;\x07"
 
 
 def main():
