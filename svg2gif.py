@@ -432,6 +432,13 @@ def main():
             max_width=args.max_width,
             max_file_size=args.max_file_size
         )
+        print("\n" + "=" * 60)
+        print("Thank you for using svg2gifpy!")
+        print("Found it helpful? Please star, fork & share the repo:")
+        print("   https://github.com/ishandutta2007/svg2gif")
+        print("Support development / Buy me a coffee:")
+        print("   https://github.com/sponsors/ishandutta2007")
+        print("=" * 60)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
