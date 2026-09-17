@@ -4,6 +4,15 @@
 
 # svg2gifpy (svg2gif) 🎨➡️🎬
 
+<p align="left">
+  <a href="https://github.com/ishandutta2007/Awesome-Awesome-Awesome"><img src="https://img.shields.io/badge/Awesome-%E2%9C%94-blueviolet?style=flat-square&logo=github" alt="Awesome"/></a><a href="https://discord.gg/jc4xtF58Ve"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" /></a>
+  <a href="https://pypi.org/project/svg2gifpy/"><img src="https://img.shields.io/pypi/v/svg2gifpy.svg?color=blue" alt="PyPI version" /></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.7+-blue.svg" alt="Python Versions" /></a>
+  <a href="https://github.com/ishandutta2007/svg2gif/actions/workflows/ci.yml"><img src="https://github.com/ishandutta2007/svg2gif/actions/workflows/ci.yml/badge.svg" alt="CI Tests" /></a>
+  <a href="https://github.com/ishandutta2007/svg2gif/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" /></a>
+  <a href="https://github.com/ishandutta2007/svg2gif/stargazers"><img src="https://img.shields.io/github/stars/ishandutta2007/svg2gif.svg?style=social" alt="GitHub Stars" /></a>
+</p>
+
 A high-performance CLI tool & Python library for converting animated SVG files into optimized, looping animated GIFs using headless Playwright and Pillow.
 
 > **PyPI Package**: [`svg2gifpy`](https://pypi.org/project/svg2gifpy/) (provides both `svg2gif` and `svg2gifpy` CLI and Python module imports)
