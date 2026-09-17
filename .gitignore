@@ -3,10 +3,11 @@
 *.egg-info
 *.env
 *.json
+*.patch
 .cache
+.venv
 __pycache__/
 contributors.txt
 ishandutta2007_svg2gif_stargazers.csv
 node_modules
 temp_repo_clone
-.venv
