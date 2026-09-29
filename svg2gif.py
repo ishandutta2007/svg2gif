@@ -401,13 +401,22 @@ except ImportError:
 
 
 def main():
-    default_input = os.path.join(os.getcwd(), "assets", "banner.svg")
+    assets_dir = os.path.join(os.getcwd(), "assets")
+    default_input = os.path.join(assets_dir, "banner.svg")
     if not os.path.exists(default_input):
-        script_dir_banner = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "banner.svg")
-        if os.path.exists(script_dir_banner):
-            default_input = script_dir_banner
+        if assets_dir:
+            print(f"{assets_dir} found but not {os.getcwd()}/banner.svg")
+            files = os.listdir(assets_dir)
+            first_svg = next((f for f in files if f.lower().endswith('.svg')), None)            
+            if first_svg:
+                default_input = os.path.join(assets_dir, first_svg)
+            else:
+                print("Warning: No .svg files found in the 'assets' directory.")
+                script_dir_banner = input(f"cant find {default_input}, specfy the path to svg :")
+                if os.path.exists(script_dir_banner):
+                    default_input = script_dir_banner
 
-    default_output = os.path.join(os.getcwd(), "assets", "social-preview.gif")
+    default_output = os.path.join(assets_dir, "social-preview.gif")
 
     parser = argparse.ArgumentParser(
         description="Convert animated SVG files into optimized looping animated GIFs."
