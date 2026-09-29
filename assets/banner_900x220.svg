@@ -1,0 +1,66 @@
+<svg width="900" height="220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="text-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="220" rx="16" fill="url(#bg-grad)"/>
+
+  <!-- Dynamic Animated Graph Signal (Background element) -->
+  <g opacity="0.35">
+    <!-- Grid lines -->
+    <line x1="50" y1="50" x2="850" y2="50" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="50" y1="110" x2="850" y2="110" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="50" y1="170" x2="850" y2="170" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+    
+    <!-- Dynamic Pulsing Waveform -->
+    <path d="M 50,140 Q 150,160 250,110 T 450,80 T 650,150 T 850,100" fill="none" stroke="#38bdf8" stroke-width="3">
+      <animate attributeName="d" 
+        values="M 50,140 Q 150,160 250,110 T 450,80 T 650,150 T 850,100;
+                M 50,120 Q 150,80 250,140 T 450,160 T 650,90 T 850,130;
+                M 50,140 Q 150,160 250,110 T 450,80 T 650,150 T 850,100" 
+        dur="6s" repeatCount="indefinite" />
+    </path>
+    <path d="M 50,110 Q 180,60 300,130 T 550,140 T 750,70 T 850,120" fill="none" stroke="#818cf8" stroke-width="2">
+      <animate attributeName="d" 
+        values="M 50,110 Q 180,60 300,130 T 550,140 T 750,70 T 850,120;
+                M 50,150 Q 180,140 300,80 T 550,100 T 750,150 T 850,90;
+                M 50,110 Q 180,60 300,130 T 550,140 T 750,70 T 850,120" 
+        dur="8s" repeatCount="indefinite" />
+    </path>
+  </g>
+
+  <!-- Foreground Title and Subtitle -->
+  <g text-anchor="middle">
+    <!-- Icon/Badge Symbol -->
+    <circle cx="450" cy="55" r="22" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
+    <path d="M 440,55 L 447,62 L 460,48" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Title -->
+    <text x="450" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="800" font-size="34" fill="url(#text-grad)" letter-spacing="1">
+      Awesome Machine Monitoring ⚙️
+    </text>
+    
+    <!-- Subtitle -->
+    <text x="450" y="155" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="500" font-size="16" fill="#94a3b8" letter-spacing="0.5">
+      Industrial IoT • Predictive Maintenance • Condition Monitoring • Real-Time OEE Analytics
+    </text>
+    
+    <text x="450" y="185" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="400" font-size="13" fill="#64748b">
+      Curated List of Commercial SaaS Platforms &amp; Open-Source GitHub Repositories
+    </text>
+  </g>
+</svg>
